@@ -1,5 +1,5 @@
 
-````txt
+````bash
 git clone git@github.com:parth-royal/linked-blog-starter-md.git
 
 wget https://github.com/zoni/obsidian-export/releases/download/v22.11.0/obsidian-export_Linux-x86_64.bin
@@ -31,5 +31,4 @@ npm run dev
 
 .export-ignore
 .gitignore
-
 ````
