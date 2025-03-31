@@ -1,0 +1,50 @@
+name: Convert Markdown Files
+env:
+  PUBLISH_DIR: publish
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Current Repository
+        uses: actions/checkout@v3
+
+      - name: Install obsidian-export
+        run: |
+          wget https://github.com/zoni/obsidian-export/releases/download/v22.11.0/obsidian-export_Linux-x86_64.bin
+          chmod +x obsidian-export_Linux-x86_64.bin
+
+      - name: Ensure clean common_md folder
+        run: |
+          rm -rf common_md
+          mkdir -p common_md
+
+      - name: Run obsidian-export
+        run: |
+          ./obsidian-export_Linux-x86_64.bin ${{ env.PUBLISH_DIR }} common_md || echo "Obsidian-export failed"
+
+      - name: Confirm common_md Creation
+        run: |
+          if [ -d "common_md" ]; then
+            echo "common_md folder created successfully."
+          else
+            echo "Failed to create common_md folder."
+            exit 1
+          fi
+
+      - name: Commit and Push common_md
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          if [ -n "$(git status --porcelain common_md)" ]; then
+            git add common_md
+            git commit -m "Add converted markdown files to common_md"
+            git push
+          else
+            echo "No changes to commit in common_md."
+          fi
